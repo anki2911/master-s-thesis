@@ -1,0 +1,39 @@
+\chapter*{}
+\thispagestyle{empty}
+\begin{center}
+\vspace{-1.9in}
+%\vspace*{11pt}
+\parskip=0.1in
+{\Large \bf Acknowledgments} 
+\end{center}
+\vspace{.1in}
+\vspace{.2in}
+%\begin{flushright}
+%{\em Success is a destination, not a goal.} \\
+%\end{flushright}
+
+\noindent
+I would like to show my highest gratitude to my advisor, \emph{Dr. Ansuman Banerjee}, Advanced Computing Microelectronics Unit, Indian
+Statistical Institute, Kolkata, for his guidance and continuous support and encouragement.
+He has literally taught me how to do good research, and motivated me with great insights and innovative ideas.
+
+\vspace{2.5mm}
+\noindent
+My deepest thanks to all the teachers of Indian Statistical Institute, for their valuable
+suggestions and discussions which added an important dimension to my research work.
+
+\vspace{2.5mm}
+\noindent
+I would also like to thank \emph{Dr. Nilanjan Banerjee},IBM Research, India,
+for her constructive comments and various discussions on my research.
+
+\vspace{2.5mm}
+\noindent
+Finally, I am very much thankful to my parents and my family for their supports and suggestions throughout the years.
+
+\vspace{.3in}
+\begin{flushright}
+{\bf Soumi Chattopadhyay}\\
+Indian Statistical Institute\\
+Kolkata - 700108 , India. 
+\end{flushright}

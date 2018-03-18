@@ -1,0 +1,3 @@
+latex book.tex 
+dvips -ta4 book.dvi -o
+gv book.ps &

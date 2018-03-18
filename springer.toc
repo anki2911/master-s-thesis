@@ -1,0 +1,14 @@
+\contentsline {chapter}{\numberline {1}Background and related work}{5}
+\contentsline {section}{\numberline {1.1}Background}{5}
+\contentsline {subsection}{\numberline {1.1.1}Propositional Logic}{5}
+\contentsline {subsection}{\numberline {1.1.2}Satisfiability}{6}
+\contentsline {subsection}{\numberline {1.1.3}Linear Temporal Logic}{6}
+\contentsline {subsubsection}{The basic temporal operators}{6}
+\contentsline {subsubsection}{Intuitive explanation}{8}
+\contentsline {subsubsection}{Formal semantics}{10}
+\contentsline {section}{\numberline {1.2}Logics for temporal specification}{11}
+\contentsline {subsubsection}{Linear Temporal Logic}{11}
+\contentsline {subsubsection}{Computation Tree Logic}{12}
+\contentsline {subsubsection}{LTL versus CTL}{14}
+\contentsline {subsubsection}{Bounded temporal logics}{15}
+\contentsline {section}{\numberline {1.3}Related Work}{17}

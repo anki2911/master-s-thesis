@@ -1,0 +1,256 @@
+\chapter{Context Rule Modeling Using Linear Temporal Logic} \label{chap6}
+\noindent
+In this chapter, we present the extension of our work with linear temporal logic.
+It is not always possible to express a context rule in simple propositional logic.
+In some cases, the server may need to take a decision by observing environmental parameters across time.
+Let us consider the following example.
+For activating the fire alarm, the server needs to have the following two conditions satisfied:
+smog comes out and within the next two minutes the temperature rises beyond a threshold.
+In this example, the server needs the information of temperature for more than one cycle.
+Simple propositional logic cannot help in this case. So, we introduce a higher order logic,
+called linear temporal logic (LTL). We already discussed the syntax and semantics for linear temporal logic 
+in Chapter~\ref{chap2}. 
+In subsequent sections, we formally discuss the task of context rule modeling using temporal logic and 
+the optimization strategies based on the context rules.
+
+
+\section{Context Rule Modeling Using Linear Temporal Logic}\label{seclc}
+\noindent
+In this section, we present the syntax of the context rule in linear temporal logic. 
+To model temporal dependencies in our context rule, we look at time in discrete steps, as is usually done in the temporal world. In other
+words, time advances in discrete steps of ones and this allows us to capture dependencies across multiple time cycles. 
+We now define the notion of a context rule and its associated actions.
+\begin{definition}{\textbf{Context Rule :}} 
+ A context rule is a Boolean combination of data predicates over time, 
+ expressed in linear temporal logic. 
+ \hfill $\blacksquare$
+\end{definition}
+Here, we consider two types of context rules.
+\begin{itemize}
+\item \textbf{B}-type context rule : These rules are expressed using the bounded fragments 
+(Next, Bounded Until, Bounded Eventually, Bounded Always) of linear temporal logic.
+ \item \textbf{S}-type context rule : These are safety rules, typically expressed using the unbounded operators (Always, Eventually, Until) 
+ of linear temporal logic. These rules are always expected to be {\em{true}}. 
+ A violation of a safety rule necessitates an action on the server side.
+ 
+\end{itemize}
+\begin{definition}{\textbf{Action :}} 
+ It is the resulting actuation taken by the server with the violation of S-type context rules and with the true evaluation 
+ of the B-type context rules. 
+ \hfill $\blacksquare$
+\end{definition}
+\vspace{1.5mm}
+\begin{definition}{\textbf{Context-Triggered Action :}} 
+ Context-Triggered Action is an expression of the form Context Rule : Action. 
+ \hfill $\blacksquare$
+\end{definition}
+\vspace{1.5mm}
+\begin{definition}{\textbf{Temporal Depth of a Context Rule :}} 
+ The temporal depth of a B-type context rule is the maximum levels of nesting of the temporal operators in the rule.  
+ \hfill $\blacksquare$
+\end{definition}
+\vspace{1.5mm}
+\noindent
+Note that, a context rule in simple propositional logic has temporal depth 0.
+The temporal depth of a S-type context rule is infinite.
+
+\begin{example}
+ Following is an example of a context-triggered action with B-type context rule: \\
+ \noindent
+ Context rule (${\cal{C}}_1$): The water level in the river is greater than the danger level and raining since 5 hours\\
+ Action (${\cal{A}}_1$): Send flood alert. \\
+ Context-Triggered Action: ${\cal{C}}_1$ : ${\cal{A}}_1$ \\
+ Data predicate $p_1$ : The water level in the river $>$ the danger level ($t_1$); \\
+ Data predicate $p_2$ : Whether it is raining; \\ 
+ ${{\cal{C}}_1} = p_1 . G^{(5)}(p_2)$;\\ 
+ The action gets fired with the true evaluation of the context rule.
+ The temporal depth of the context rule is 5.  
+ 
+ \noindent
+ Following is an example of a context-triggered action with S-type context rule: \\
+ Context rule (${\cal{C}}_2$): The water level in the storage is greater than a minimum threshold level until it is raining\\
+ Action (${\cal{A}}_2$): Send shortage of water alert. \\
+ Context-Triggered Action: ${\cal{C}}_2$ : ${\cal{A}}_2$ \\
+ Data predicate $p_3$ : The water level in the river $>$ the minimum threshold level ($t_2$); \\
+ Data predicate $p_4$ : Whether it is raining; \\
+ ${{\cal{C}}_1} = p_3 U p_4$;\\ 
+ The action gets fired with the violation of the context rule.
+ The temporal depth of the context rule is infinite. 
+\end{example}
+
+
+\section{Optimization Strategies}\label{seclo}
+\noindent
+In this section, we discuss optimization strategies for context rules in LTL.
+
+\subsection{Optimizations based on effective utility:}
+\noindent
+Our first analysis is based on the derivative of a context rule.
+We have already defined the notion of derivative in Chapter~\ref{chap3}.
+The definition, which we gave earlier, is valid for a Boolean formula. 
+Now, our set of context rules are specified in linear temporal logic.
+It is known that a bounded linear temporal logic formula can be 
+unfolded as a Boolean logic formula using the notion of time frame expansion,
+wherein multiple copies of the variable s are created to capture their existence over time. 
+This mechanism works perfectly for our B-type context rules and hence they can be unfolded as Boolean formulae over time.
+However, for S-type context rules, which are typically unbounded we can adopt a temporal upper bound and expand the formulae
+similarly. This is how we handle the context rules in our framework at the cost of a blow up in the number of variables. 
+Once we have the Boolean representation, we can now use the optimization operations defined in Chapter~\ref{chap3} 
+in a straight forward way.
+
+\begin{example}
+Let us consider a few examples of unfolding for B-type context rules.\\
+${\cal{C}}_1 = F_{[0,3]}(p) = p^{(0)} + p^{(1)} + p^{(2)} + p^{(3)}$;\\
+${\cal{C}}_2 = G_{[0,3]}(q) = q^{(0)} . q^{(1)} . q^{(2)} . q^{(3)}$;\\
+${\cal{C}}_3 = p U_{[0,3]} q = q^{(0)} + p^{(0)}.q^{(1)} + p^{(0)}.p^{(1)}.q^{(2)} + p^{(0)}.p^{(1)}.p^{(2)}.q^{(3)}$
+\hfill$\blacksquare$
+\end{example}
+
+\noindent
+In this work, we assume a 
+user specified bound $t$ on the number of steps for 
+which the unfolding needs to be performed. 
+In the general setting, to have a conclusive decision 
+about the derivative of a given LTL formula ${\cal C}$, we need to 
+look up to bound $t$, where $t$ is $4 ^{1 + length ({\cal C})}$~\cite{r16}. 
+The choice of the bound as an exponent of the length of the formula 
+follows from the Ultimately Periodic Model Theorem~\cite{r16} for LTL.
+However, in most practical 
+cases, the user may have some idea on the upper bound for which 
+he wishes to perform the derivative analysis.
+
+\noindent
+However, if we follow this approach, there is a blowup cost we have to pay.
+The size of the formula can be the order of $d*k$ in the worst case, 
+where $k$ is the number of predicates and $d$ is the temporal depth of the context rule. 
+Intuitively, in the worst case, by unfolding a LTL formula we will have $d$ copies of each of the k predicates in its unfolded form.
+Hence, the 
+maximum number of computations required for derivative analysis of a context rule is also $d*k$  in the worst case.
+Moreover, in each computation we have to deal with the large size of the formula.
+But this approach sometimes leads to computational overhead.
+%Consider $\cal{C}$ be a context rule. We want to perform the derivative of $\cal{C}$ with respect to $p^{(i)}$, i.e., a 
+%predicate $p$ at $i^{th}$ time instant.
+
+\begin{comment}
+\begin{example}
+ Let, ${\cal{C}} = q + G^{(5)}(p)$ be a context rule. We want to find the derivative with respect to $p^{(3)}$.
+ ${\cal{C}} = q + p^{(3)}. (p^{(0)}.p^{(1)}.p^{(2)}.p^{(4)}.p^{(5)})$.
+ Then we get the following after recursion:\\
+ $\partial{\cal{C}}/\partial{p^{(3)}} = {\bar{q}}.p^{(0)}.p^{(1)}.p^{(2)}.p^{(4)}.p^{(5)}.\partial p^{(3)}/\partial{p^{(3)}}$
+ \hfill$\blacksquare$
+\end{example}
+\vspace{1.5mm}
+\end{comment}
+
+
+
+
+%\begin{figure}[!htb]
+%\begin{center}
+%\includegraphics[height=1.2in,width=3.2in]{DA.png}
+%\label{da}
+%\caption{Critical \& Independent Predicates Analysis through Derivative}
+%\end{center}
+%\end{figure}
+
+%Finally we discuss how the derivative analysis of a context rule helps us in message transmission reductions. 
+%Obviously, the predicates which are not required to evaluate any of the context rule defined in the server,
+%sensor can stop observing those predicates. On the other hand, the predicates which are critical for the 
+%evaluation of a context rule always need to monitor and every change of those predicates need to transmit to
+%the server.
+
+%\begin{example}
+% /*EXAMPLE*/
+%\end{example}
+
+
+\subsection{Optimizations based on co-factors:}
+\noindent
+In this section, we discuss the optimization techniques based on the co-factor analysis of a context rule. 
+We expand the context rules as we discussed in the previous section and then do the co-factor analysis.
+The optimization strategy is same as we explained in Chapter~\ref{chap3}.
+The only difference is that here we have to do co-factor analysis across time cycles.
+In this regard we discuss two models of co-factor analysis.
+
+\noindent
+{\bf{Without Memory Model : }}
+
+\noindent
+In this model, we assume that the sensor has no memory to keep the records for a data predicate.
+In this model, if the current snapshot matches with an interest set of a context rule, the sensor needs to 
+transmit the changes of the values of the predicates belonging to that interest set. Along with those predicates the
+sensors may as well need to transmit some more predicates as explained in the example below.
+
+\begin{example}
+ Let, ${\cal{C}} = p_1 + Xp_2 + XXp_3$ be a context rule. Let us assume at a particular time instant, $p_2 = 1$. Now,
+ $\{Xp_2\}$ is an interest set for $\cal{C}$. So, as long as the value of $p_2$ is true the server can take an action. 
+ In this situation, if $p_2$ becomes false, to take an action, the server may
+ require the value of $p_1$ in the previous cycle. Since the sensors have no memory, it is require to 
+ transmit the value of $p_1$ along with $p_2$ in each cycle, though $p_2$ is enough to take the evaluation decision for ${\cal{C}}$.
+ \hfill$\blacksquare$
+\end{example}
+
+
+\noindent
+{\bf{With Memory Model : }}
+
+\noindent
+In this model, we assume that the sensor has sufficient memory to keep the records for a data predicate.
+In this model, if the current snapshot matches with an interest set of a context rule, the sensor needs to 
+transmit the changes of the values of the predicates belonging to that interest set only. In this case it may be noted,
+we can avoid extra transmissions needed in the previous mode.
+
+\noindent
+We consider a context rule $\cal{C}$ with temporal depth $d$ and $k$ predicates.
+If the minimum nesting depth of a predicate $p$ be $d_p$, we need
+$(d - d_1)$ memory spaces at the sensor end to store the value of $p$ for the evaluation of $\cal{C}$.
+This computation has to be performed for each predicate with respect to each context rule. Finally, the maximum 
+memory space for each predicate across multiple context rules will have to be provision at the sensor end.
+
+\begin{example}
+Let, ${\cal{C}}_1 = p_1 + Xp_2$, ${\cal{C}}_1 = p_2 + XXp_3$. For ${\cal{C}}_1$ we need one memory space for $p_1$,
+while for ${\cal{C}}_2$ two memory spaces are required for $p_1$. Therefore, for $p_1$, the sensor has to provision two memory spaces.
+ \hfill$\blacksquare$
+\end{example}
+
+\begin{comment}
+\noindent
+Now we formally propose an algorithm to find the memory requirement of each predicate defined in the server.
+%====================================
+\begin{algorithm}
+  \caption{MemoryRequirementAnalysis}
+  \begin{algorithmic}[1]
+  \State {Input:  ${\cal{P}}=\{p_1,p_2,\ldots,p_m\}, {\hat{\cal{C}}}=\{{\cal{C}}_1,{\cal{C}}_2,\ldots,{\cal{C}}_k\}$}
+  \State {Output: ${\cal{M}}_1, {\cal{M}}_2,\ldots, {\cal{M}}_m$}\\
+  \Comment{\emph{Memory space is required by each predicate}}
+  \State Initialize ${\cal{M}}_1, {\cal{M}}_2,\ldots, {\cal{M}}_m$ by 0.
+  \For{$c \in {\hat{\cal{C}}}$}
+    \For{$p_i \in {\cal{P}}$}
+      \State Calculate time instant $(d_1)$, at which $p_i$ is required to compute $c$ for the first time.    
+      \If{Temporal Depth of $c -d_1 >   {\cal{M}}_i$} 
+	\State ${\cal{M}}_i =$ Temporal Depth of $c -d_1$ 
+      \EndIf
+    \EndFor
+  \EndFor
+ \end{algorithmic}
+ \label{algo1}
+\end{algorithm}
+%====================================
+\end{comment}
+
+\noindent
+\paragraph*{The overall scheme: }
+
+\noindent
+Here, we discuss the overall approach for analyzing a context rule. The context rule, expressed in LTL is unfolded
+to its corresponding Boolean formula first.
+In the derivative analysis phase, the server identifies the set of predicates which are not required to evaluate any of the context rules.
+Accordingly, the sensors stop monitoring these predicates.
+The server does the co-factor analysis as discussed in Chapter~\ref{chap3} in the next phase. 
+According to with/ without memory model,
+the server takes the decision at runtime which predicates are required for current context computation.
+The remaining optimization strategies are similar to what we discussed in Chapter~\ref{chap3}.
+
+
+
+

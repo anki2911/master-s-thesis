@@ -1,0 +1,748 @@
+\chapter{Consistency Analysis of Context-based Specifications} \label{chap6}
+In this chapter, we focus on the problem of consistency analysis of 
+context-based specifications. Checking consistency is an important 
+requirement for property verification, as mentioned in Chapter~\ref{chap2}, 
+and we show that the context-sensitive style of formal specifications is 
+amenable to consistency analysis. 
+
+\noindent
+In particular, we first study the satisfiability and realizability problems 
+for context-bounded specifications. We show that
+context-bounded properties written in LTL have the same
+complexities for satisfiability and realizability as is applicable for
+normal LTL properties.
+
+\noindent
+As a next step, we move on to the consistency analysis of the generic model 
+of context-sensitive specifications and present some interesting results. 
+In particular, while the complexities of the satisfiability and 
+realizability problems for the generic class of context-sensitive 
+properties follows as in the case of their context-bounded counterparts, 
+we show that context-sensitive properties restricted to the 
+GR (1) fragment~\cite{nir} of LTL have lower realizability checking complexity. 
+The main proposition of our approach is in having auxiliary state
+machines and context-sensitive properties in GR(1) LTL. We claim that this
+can significantly extend the expressive power of GR(1) LTL beyond simple
+Streett requirements, thereby, making it more practical and useful.
+The more interesting result, as we show here, is the fact that a
+formal specification consisting of auxiliary state machines and 
+context-sensitive 
+GR(1) LTL properties is also contained in the GR(1) subset of LTL, and
+therefore, has a lower realizability checking complexity. 
+
+\section{Context-Bounded Properties: Consistency Analysis} \label{sec6.1}
+In this section, we take up the problem of satisfiability and 
+realizability of context-bounded properties. 
+To keep our analysis simple, we consider the basic model of 
+context-bounded properties, given in Definition~\ref{def4.3} in 
+Chapter~\ref{chap4}, where we have considered a single auxiliary state 
+machine over which the context-bounded properties are defined. However, 
+our proof methodology below is generic, and easily extends to the 
+more general case of multiple auxiliary state machines. For the sake of 
+completeness of this chapter, we restate the formal model of context-bounded 
+properties below.
+
+\subsection{Formal Model of context-bounded properties}
+To define the syntax of a context-bounded property, we need 
+the following:
+
+\begin{itemize}
+
+\item ${\cal AP}$: the set of atomic propositions, and
+
+\item An auxiliary state machine 
+	${\cal A}$ = $\langle {\cal X}, {\cal C}, {\cal C}_0, {\cal T} 
+	\rangle$, where 
+
+\begin{itemize}
+
+\item ${\cal X}\ \subseteq\ {\cal AP}$ is the set of 
+    propositions used in the state machine description ${\cal A}$,
+
+\item ${\cal C}$ is the set of contexts (states) of ${\cal A}$,
+
+\item ${\cal C}_0$ is the start context (state) of machine ${\cal A}$,
+
+\item ${\cal T}: {\cal C} \times 2^{{\cal X}} \rightarrow {\cal C}$
+    is the next-state function for ${\cal A}$ (the transition function is total 
+	and deterministic,
+	i.e. for every context, for every combination of 
+	${\cal X}$, there is a unique next state). We denote a {\em transition} 
+	$t$ = $T(s, \eta)$, where $s,t \in {\cal C}$ and $\eta \in 2^{\cal X}$
+    by the ordered pair (s,t).
+	In our work, we assume that the auxiliary state 
+	machine is minimized/reduced, which in any case can be easily 
+	automated since the machine is completely specified.
+
+%\item ${\cal L}: {\cal C} \Rightarrow {\cal C}_i$ is a labeling of 
+%	states with the context proposition true in that state. Each state 
+%	in ${\cal S}_i$ is labeled by a unique context proposition 
+%	$c \in {\cal C}_i$, and for two states, $s_i, s_j \in {\cal S}_i$, 
+%	${\cal L}_i(s_i) \neq {\cal L}_i(s_j)$ if $s_i \neq s_j$. 
+%	Therefore, ${\cal L}_i$ is a bijection from ${\cal S}_i$ to ${\cal C}_i$.
+\end{itemize}
+
+\end{itemize}
+
+\noindent
+A context-bounded property is of the form
+$\phi$ = ${\Gamma}:{\cal L}$, such that:
+
+\begin{itemize}
+
+\item ${\Gamma} \in {\cal C}$, and 
+
+\item ${\cal L}$ is a LTL property over ${\cal Y} \subseteq 
+	{\cal AP}$ such that ${\cal X} \cap {\cal Y}$ is null.
+	The syntax of a context-bounded property is as follows: 
+	(p is any atomic proposition $\in {\cal Y}$):
+\begin{itemize}
+
+\item $\Gamma:p$ is a context-bounded property,
+
+\item If $\Gamma:f$ and $\Gamma:g$ are context-bounded properties, 
+		then so are $\Gamma:\neg {f}$, $\neg (\Gamma: f)$,
+        $\Gamma:f \land g$, $\Gamma:f \lor g$, $\Gamma:X\ f$ and
+		$\Gamma:f\ U\ g$.
+\end{itemize}
+\end{itemize} 
+
+\noindent
+The syntax is similar to LTL, except that each property is
+annotated with a context expression ${\Gamma}$. We do not restate the 
+semantics of context-bounded properties here, since they have been 
+given in details in Chapter~\ref{chap4}. The key point needed for 
+our consistency analysis of context-bounded properties is the fact 
+that the {\em scope of ${\cal L}$ is restricted to $\Gamma$-satisfying 
+states.}
+
+\subsection{Satisfiability}
+As mentioned in Chapter~\ref{chap2}, 
+a temporal property in LTL over a set of variables is 
+{\em satisfiable} if there is a witness that can assign values to 
+the variables in each time step such that
+the property is satisfied. For example, the property $G\ p$ is 
+satisfiable whereas, $G\ p \land F\ \neg p$ is unsatisfiable. 
+Satisfiability for LTL properties has been well studied and 
+established to be PSPACE-complete. In this section, we study the 
+satisfiability of context-bounded properties written in LTL. 
+\begin{definition}
+A context-bounded property ${\varphi = \Gamma: {\cal L}}$ is 
+satisfiable if the LTL property ${\cal L}$ has a 
+satisfying witness. $\Box$
+\end{definition}
+
+\noindent
+Note that, in the above definition, we do not consider the condition of 
+satisfaction of $\Gamma$ since $\varphi$ is vacuously valid if 
+$\Gamma$ is unreachable/unsatisfiable.
+In the following discussion, we show that the satisfiability problem for 
+context-bounded LTL and unrestricted LTL coincide, and that 
+the satisfiability problem for context-bounded LTL is also 
+PSPACE-complete. Before presenting the formal reduction, we present a 
+few interesting results.
+ 
+\begin{lemma} \label{lemm6.1}
+There exists a context-bounded LTL property $\varphi = \Gamma: {\cal L}$ 
+such that all states on all 
+paths $\pi$ that act as a witness of $\varphi$ satisfy $\Gamma$. \\ 
+{\bf Proof:} {\em Consider the property 
+$\varphi = \Gamma: GF\ p \land\ GF\ \neg p$. The proof is by contradiction. 
+Consider a witness 
+$\pi\ =\ s_0,s_1,s_2 \ldots s_k, s_{k+1} \ldots$ for $\varphi$ such 
+$\forall i,\ 0 \leq i \leq k$, we have $s_k \models \Gamma$ and 
+$s_{k+1} \not \models \Gamma$. By the 
+semantics of satisfaction for a context-bounded property of the form 
+$G\ \psi$, all states $s_0,s_1,s_2 \ldots s_k$ on $\pi$ must model 
+$F\ p$ and $F\ \neg p$. Consider the state $s_k$ on $\pi$. Since 
+$s_{k+1} \not\models \Gamma$, to satisfy 
+$F\ p$, we must have $s_k \models p$, while to satisfy $F\ \neg p$, we must 
+have $s_k \models \neg p$. Hence, we have $s_k \models p \land \neg p$, a 
+contradiction. Hence, every state on $\pi$ has to be context-labeled.}
+$\Box$
+\end{lemma}
+
+\begin{lemma} \label{lemm6.2}
+If a context-bounded LTL property $\phi = \Gamma: {\cal L}$ has a 
+finite context-labeled witness
+$\pi$, then the property also has a infinite context-labeled witness. \\
+{\bf Proof:} {\em Consider a finite context-labeled witness 
+$\pi\ =\ s_0,s_1,s_2 \ldots s_k$ for $\phi$ such that 
+$\forall i,\ 0 \leq i \leq k$, we have $s_k \models \Gamma$. 
+The infinite witness can be constructed trivially from 
+$\pi$ by introducing a loop at the final state $s_k$ of the context-labeled 
+witness $\pi$ to generate 
+$\pi'$. Evidently, $\pi'$ is also a witness for $\phi$.
+} $\Box$
+\end{lemma}
+
+\begin{theorem} \label{thrm6.1}
+A context-bounded property $\varphi = \Gamma: {\cal L}$ is satisfiable 
+iff the unrestricted 
+LTL property ${\cal L}$ is satisfiable according to LTL semantics. \\
+{\bf Proof:} {\em Consider the case where ${\cal L}$ is satisfiable. 
+Then, each state of the witness 
+for ${\cal L}$ can be labeled with $\Gamma$ to construct a witness for 
+$\varphi = \Gamma: {\cal L}$. 
+
+\noindent
+Consider the case, where $\varphi = \Gamma: {\cal L}$ is satisfiable. 
+Now, there are two possibilities. 
+
+\begin{itemize} 
+
+\item ${\cal L}$ has an infinite context-labeled witness, in which case, 
+	the same witness is a witness for the unrestricted LTL 
+	property ${\cal L}$. 
+
+\item ${\cal L}$ has a finite context-labeled witness. In this case, it 
+	follows from Lemma~\ref{lemm6.2} that we can construct an infinite 
+	witness on which the unrestricted LTL property ${\cal L}$ is also 
+	satisfied.
+
+\end{itemize} 
+
+\noindent
+In both the cases, ${\cal L}$ is satisfiable if $\varphi = \Gamma: {\cal L}$ 
+is satisfiable.
+} $\Box$
+\end{theorem}
+
+\begin{theorem} \label{thrm6.2}
+The satisfiability problem for context-bounded LTL is PSPACE-complete.\\
+{\bf Proof:} {\em The proof follows as a straightforward extension from the 
+discussion above and the proof of PSPACE-hardness of LTL satisfiability 
+given in~\cite{vardi:86}.}
+$\Box$
+\end{theorem}
+
+\subsection{Realizability} \label{sec6.1.3}
+To formulate the realizability problem for context-bounded
+properties in LTL, we partition the set ${\cal AP}$ of atomic 
+propositions into two sets, as defined below:
+
+\begin{itemize}
+
+\item ${\cal I}$: the set of input signals of the DUT
+
+\item ${\cal O}$: the set of output signals of the DUT
+
+\end{itemize}
+
+\noindent
+The formal definitions of the auxiliary state machine and the 
+context-bounded property remains as earlier. Before we remark 
+on the complexity of the realizability problem for context-bounded 
+properties, we state two useful observations below. 
+
+\begin{itemize}
+
+\item The transition relation of an auxiliary state machine 
+	${\cal A}$ = $\langle {\cal X}, {\cal C}, {\cal C}_0, {\cal T}
+    \rangle$ can be expressed by the following  LTL formula:
+	\[{\cal T}_\phi = G (\bigwedge_{c \in {\cal C}, \eta \in 2^{\cal X}}
+	(c\ \land \eta \Rightarrow X\ t))\] where $t\ = {\cal T}(c, \eta)$.
+
+\item The auxiliary state machine specifying the context transitions 
+	is essentially an assumption for a context-bounded property. 
+	Therefore, a context-bounded property of the form 
+	$\varphi\ = \Gamma: {\cal L}$ can be interpreted as the LTL property:
+	\[{\cal T}_\phi  \Rightarrow\ (\Gamma \Rightarrow {\cal L})\]
+	where ${\cal T}_\phi$ is as above.
+
+\end{itemize}
+
+\begin{theorem} \label{thrm6.3}
+The realizability problem for context-bounded LTL is 2EXPTIME-complete. \\
+{\bf Proof:} {\em The proof follows from Lemma~\ref{lemm6.1} and the 
+result~\cite{pnueli:89} on the complexity of LTL realizability.
+}$\Box$
+\end{theorem}
+
+\noindent
+It is evident that the above analysis of satisfiability and realizability 
+for context-bounded properties extends similarly if we have multiple 
+auxiliary state machines and more generic 
+expressions for specifying the context. 
+
+\section{Context-Sensitive LTL properties: Realizability} \label{sec6.2}
+In this section, we take up the analysis of the generic model of 
+context-sensitive properties (without the context-boundedness requirement) 
+used in Chapter~\ref{chap5}. Evidently, it 
+follows that these properties have the same complexity 
+requirements for consistency analysis as normal LTL. Based on the 
+discussion in the previous section, we can state the following result 
+which captures the complexities of the consistency analysis procedures for 
+context-sensitive properties. 
+
+\begin{lemma} \label{lemma6.3}
+The complexities of the satisfiability and realizability problems for 
+context-sensitive properties are respectively PSPACE-complete and 
+2-EXPTIME complete. 
+$\Box$
+\end{lemma}
+
+\noindent
+The high complexity of the realizability procedure above motivated us to 
+look into LTL subsets which have lower realizability checking 
+complexity and the power of the resulting language consisting of 
+context-sensitive properties restricted to that subset and auxiliary 
+state machines. The following research is the outcome of our 
+analysis with the GR (1) subclass of LTL. In~\cite{nir}, Peterman et al. 
+have identified a fragment of LTL, known as Generalized
+Reactivity (1) (GR (1)), for which the realizability problem can be
+solved in EXPTIME. In this work, we attempt to extend the GR(1)
+paradigm with the use of auxiliary state machines
+as part of the formal specification.
+This extended the expressibility of GR(1) LTL beyond simple
+Streett requirements, thereby making it more practical and useful.
+The more interesting result, as we show here, is the fact that
+formal specifications consisting of auxiliary state machines and
+GR(1) LTL properties are contained in the GR(1) subset of LTL, thereby 
+enjoying a computationally easier realizability checking procedure.
+
+\subsection {GR(1) LTL}
+\noindent
+Consider a module ${\cal M}$ having ${\cal I}$ as the set of input variables
+and ${\cal O}$ as the set of output variables. GR(1) LTL 
+considers specifications of the form
+$\phi$ = $\phi_e\ \rightarrow\ \phi_s$ with the requirement that each of
+$\phi_a$ for $a \in \{e,s\}$ can be a conjunction of only the
+following parts (none of them are compulsory):
+
+\begin{itemize}
+
+\item $\phi^i_a$: a Boolean formula characterizing the initial configuration
+
+\item $\phi^t_a$: a formula of the form $\bigwedge_{i} G\ B_i$ where each
+    $B_i$ is a Boolean combination of variables from ${\cal I} \cup {\cal O}$
+    and expressions of the form $X\ v$ where $v \in \cal I$ if $a\ = e$ and
+    $v\ \in\ {\cal I} \cup {\cal O}$ otherwise.
+
+\item $\phi^g_a$: a formula of the form $\bigwedge_{i} GF\ B_i$ where each
+    $B_i$ is a Boolean formula.
+
+\end{itemize}
+
+\noindent
+The specification fragment is illustrated through the following example.
+
+\begin{example} \label{example6.2.1}
+{\em Consider an arbiter module with two request inputs $r_1$ and $r_2$ and two
+grant output signals $g_1$ and $g_2$. The arbiter arbitrates between the
+requesting clients by giving exclusive access to a resource. Hence, we
+have ${\cal I}$ = $\{r_1, r_2\}$ and ${\cal O}$ = $\{g_1, g_2\}$.
+Following are the assumptions on the behaviors of the clients.
+
+\begin{itemize}
+
+\item [A1:] Initially both the requests are low.
+
+\item [A2:] Once request has been made and not granted, it cannot be withdrawn.
+
+\item [A3:] Requests are fair, in the sense, that once granted, the requesting
+    agent releases the resource by lowering its request.
+
+\end{itemize}
+
+\noindent
+The above requirements can be captured for each of the requesting
+clients in the subset of LTL as follows:
+
+\begin{itemize}
+
+\item [$\tau_1$:] $\neg r_1\ \land\ G((r_1\ \neq g_1)\ \rightarrow
+        (r_1 = X r_1))\ \land\ G ((r_1 \land g_1) \rightarrow F\ \neg r_1)$
+
+\item [$\tau_2$:] $\neg r_2\ \land\ G((r_2\ \neq g_2)\ \rightarrow
+        (r_2 = X r_2))\ \land\ G ((r_2 \land g_2) \rightarrow F\ \neg r_2)$
+
+\end{itemize}
+
+\noindent
+We now state the requirements on the arbiter behavior.
+
+\begin{itemize}
+
+\item [P1:] Grants are mutually exclusive.
+
+\item [P2:] Initially both the grants are low.
+
+\item [P3:] The arbiter maintains a grant as long as the corresponding client
+        requests, and to eventually satisfy every request, it lowers
+        grants that are no longer requested for.
+
+\end{itemize}
+
+\noindent
+The above requirements can be captured for the arbiter as follows:
+
+\begin{itemize}
+
+\item [$\psi_1$:] $G (\neg g_1\ \lor \neg g_2)$
+
+\item [$\psi_2$:] $\neg g_1\ \land\ G((r_1\ =\ g_1)\ \rightarrow
+        (g_1 = X g_1))\ \land\ G ((\neg r_1 \land g_1) \rightarrow
+        F\ \neg g_1)$
+
+\item [$\psi_3$:] $\neg g_2\ \land\ G((r_2\ =\ g_2)\ \rightarrow
+        (g_2 = X g_2))\ \land\ G ((\neg r_2 \land g_2) \rightarrow
+        F\ \neg g_2)$
+
+\end{itemize}
+For the arbiter specification, $\phi_e$ = $\tau_1\ \land\ \tau_2$ and
+$\phi_s$ = $\psi_1\ \land\ \psi_2\ \land\ \psi_3$. The overall specification
+is $\phi_e\ \rightarrow\ \phi_s$ which is in GR(1) LTL.
+} $\Box$
+\end{example}
+
+\subsubsection{Realizability of GR(1) LTL} \label{sec6.2.2}
+\noindent
+In~\cite{nir}, the realizability problem for GR(1) LTL has been reduced to
+the decision of the winner in an infinite two-player game played between
+the module and its environment. The authors have presented a solution to
+this game. The following theorem captures the complexity of the
+procedure.
+
+\begin{theorem} [Reproduced from ~\cite{nir}] \label{thrm6.4}
+Given sets of input variables ${\cal I}$ and output variables ${\cal O}$
+(${\cal I}$ and ${\cal O}$ are both Boolean) and an LTL
+formula $\phi$ in GR(1) LTL with $m$ and $n$ conjuncts
+respectively for $\phi_e$ and $\phi_s$, it is possible to determine
+whether $\phi$ is realizable in time proportional to
+$(nm2^{|\cal I| + |\cal O|})^3$.
+$\Box$
+\end{theorem}
+
+
+\subsection{Context-sensitive GR(1) LTL}
+In this section, we first define the formal model of context-sensitive 
+properties restricted to GR (1) LTL. The definition is a straightforward 
+extension of context-sensitive properties in the previous chapter. 
+
+\subsection{Formal Model}
+To define the syntax of a context-sensitive property, we need
+the following:
+
+\begin{itemize}
+
+\item ${\cal AP}$: the set of atomic propositions over which the
+    specification is described, which is partitioned into the following
+    disjoint subsets:
+\begin{itemize}
+
+\item ${\cal I}$: the set of input signals of the device under test, and
+
+\item ${\cal O}$: the set of output signals of the device
+    under test,
+
+\end{itemize}
+such that ${\cal AP}$ = ${\cal I}\ \cup {\cal O}$, 
+
+\item ${\cal M}$: the set of auxiliary state machines, used for
+    modeling the abstract states of the device under test.
+
+\end{itemize}
+
+\noindent
+The set ${\cal M}$ of auxiliary state machines consists of a collection
+of finite deterministic state machines $M_i$, each of the form
+$\langle {\cal AP}_i, {\cal S}_i, {\cal S}^0_i, {\cal T}_i \rangle$, where:
+
+\begin{itemize}
+
+\item ${\cal AP}_i\ \subseteq\ {\cal AP}$ is the set of
+    propositions used in the state machine description $M_i$, such that
+    ${\cal AP}_i$ is partitioned into two disjoint subsets
+    ${\cal I}_i\ \subseteq {\cal I}$, and ${\cal O}_i\ \subseteq {\cal O}$,
+    with ${\cal AP}_i$ = ${\cal I}_i\ \cup\ {\cal O}_i$,
+
+\item ${\cal S}_i$ is the set of states,
+
+\item ${\cal S}^0_i$ is the start state of machine $M_i$. 
+
+item ${\cal T}_i: {\cal S}_i \times 2^{{\cal AP}_i} \rightarrow {\cal S}_i$
+    is the next-state function for $M_i$ (the transition function is total
+    and deterministic,
+    i.e. for every present state, for every combination of
+    ${\cal AP}_i$, there is a unique next state). We denote a {\em transition}
+    $t$ = $T(s, \eta)$, where $s,t \in {\cal S}_i$ and $\eta \in 2^{\cal AP}_i$
+    by the ordered pair (s,t).
+
+\end{itemize}
+
+\noindent
+Let ${\cal S}$ denote $\bigcup_i S_i$, assuming each state of each
+auxiliary state machine has a unique state variable associated with it.
+We define a context-sensitive property in GR (1) LTL as follows: 
+
+\begin{definition}
+A context-sensitive GR (1) LTL property ${\cal L}$ is a property defined 
+in GR (1) LTL over ${\cal S} \cup AP$ with ${\cal S} \cup {\cal I}$
+as the set of input and ${\cal O}$ as the set of output variables.
+$\Box$
+\end{definition}
+
+\begin{figure}[htb]
+\psfrag{frame}{$frame$}
+\psfrag{stopand}{$stop \land$}
+\psfrag{nstopand}{$stop \land$}
+\psfrag{nframe}{$\neg frame$}
+\psfrag{nframeack}{$\neg ack \land frame$}
+\psfrag{nframeand}{$frame \land$}
+\psfrag{ack}{$ack$}
+\psfrag{nirdy}{$\neg irdy$}
+\psfrag{irdy}{$irdy$}
+\psfrag{trdyand}{$trdy \land$}
+\psfrag{nirdy}{$\neg irdy$}
+\psfrag{ntrdyand}{$\neg trdy \land$}
+\psfrag{brdydef}{$stop \land frame$}
+\psfrag{nbrdydef}{$\neg stop \land frame$}
+\psfrag{nbrdyand}{$stop\ \lor$}
+\psfrag{ndef}{$frame$}
+\psfrag{framen}{$frame \land$}
+\psfrag{nstop}{$\neg stop$}
+\psfrag{stop}{$stop$}
+\psfrag{stopn}{$stop \land$}
+\centering
+\includegraphics[scale=0.6]{../vdat07/pci1.eps}
+\caption{Auxiliary state machines for Example~\ref{example4.1}} \label{fig6.1}
+\end{figure}
+
+\noindent
+To illustrate the notion of context-sensitive GR (1) LTL properties, we 
+revisit Example~\ref{example4.1} of Chapter~\ref{chap4}. 
+
+\begin{example} \label{example6.1}
+{\em We do not reiterate the 
+functionalities of the protocol specification here. The specification 
+is defined over the two auxiliary state machines shown in Figure~\ref{fig6.1}. 
+The specification consists of the following properties.
+\begin{itemize}
+\item [P1:] $G(BUSY\ \Rightarrow validaddr)$
+\item [P2:] $G(rw \land STOP \Rightarrow F (abort))$
+\item [P3:] $G(RDY \land \neg trdy \land irdy\ \Rightarrow X(delayed))$
+\item [P4:] $G(WAIT\ \Rightarrow F(TRANS))$
+\item [P5:] $G(rw \land M1.TRANS \land M2.STOP) \Rightarrow F\ (abort))$
+\end{itemize}
+\noindent
+Evidently, all the above properties are context-sensitive.
+} 
+$\Box$
+\end{example}
+
+\noindent
+We now attempt to interpret Example~\ref{example6.1} in the light of the 
+definition of context-sensitive GR (1) LTL. 
+For this example, we have the following:
+
+\begin{tabbing}
+aa \= aaa \= aaa \= aaaa\= \kill
+${\cal AP} = \{frame, ack, trdy, irdy, stop, rw, delayed, start, abort, validaddr \}$ with \\
+${\cal I}$ = $\{ack, trdy, stop \}$ \\
+${\cal O}$ = $\{frame, irdy, rw, delayed, start, abort, validaddr \}$
+\end{tabbing}
+
+\noindent
+The partitioning into input and output signals has been done depending
+on the direction (input/output) of each signal with respect to the master
+device.
+The auxiliary state machines M1 and M2 in Figure~\ref{fig6.1}
+have the following definitions:
+\begin{itemize}
+\item
+      ${\cal AP}_1 = \{frame, ack, trdy, irdy \}$ with
+      ${\cal I}_1 = \{ack, trdy \}$ and ${\cal O}_1 = \{frame, irdy \}$,
+      ${\cal S}_1 = \{IDLE, BUSY, RDY, TRANS, WAIT \}$,
+      ${\cal S}^0_1 = IDLE$, and the transition relation
+      is total and deterministic,
+\item  ${\cal AP}_2 = \{frame, stop \}$ with
+      ${\cal I}_2 = \{stop \}$ and ${\cal O}_2 = \{frame \}$,
+      ${\cal S}_2 = \{STOP, INIT, DONE \}$,
+      ${\cal S}^0_2 = INIT$, and the transition relation
+      is total and deterministic,
+\end{itemize}
+The assertions $P1 \ldots P5$ defined over
+${\cal S}_1 \cup {\cal S}_2 \cup {\cal AP}$
+are all context-sensitive and obey the GR(1) LTL restrictions.
+
+\subsection{Realizability of Context-sensitive GR(1) LTL}
+\noindent
+A context-sensitive property ${\cal L}$ defined over 
+${\cal S} \cup {\cal AP}$ with the set 
+${\cal AP}$ partitioned into ${\cal I}$ and ${\cal O}$,
+can be transformed to a form 
+$\phi = \phi_e\ \rightarrow\ \phi_s$ where $\phi$ is in GR(1) LTL with 
+${\cal I} \cup {\cal S}$ as the set of inputs and ${\cal O}$ as the 
+set of outputs. This is due to the following observations.
+
+\begin{itemize}
+
+\item The initial state of each auxiliary state machine corresponds to the 
+	initial configuration component of a GR(1) formula. 
+
+\item The transition relation of an auxiliary state machine
+	$\langle {\cal AP}_i, {\cal S}_i, {\cal S}^0_i, {\cal T}_i \rangle$
+    can be expressed by the following  GR(1) LTL formula:
+    \[{\lambda} = G (\bigwedge_{s \in {\cal S}_i, \eta \in 2^{{\cal AP}_i}}
+    (s\ \land \eta \Rightarrow X\ t))\] where $t\ = {\cal T}_i(s, \eta)$, 
+	and therefore, $t \in {\cal S}$.
+
+\item The auxiliary state machines specifying the context transitions
+    can essentially be treated as assumptions for a context-sensitive property.
+    Therefore, a context-sensitive property
+    ${\cal L}$ can be interpreted as the LTL property:
+    \[(\bigwedge_i ({\cal S}^0_i \land {\lambda}_i))
+	\Rightarrow\ {\cal L}\]
+    where each ${\lambda}_i$ is as above.
+	
+
+\item The antecedent $\bigwedge_i ({\cal S}^0_i \land 
+	{\lambda}_i)$ satisfies the requirements of 
+	$\phi_e$ in a GR(1) LTL specification. Since ${\cal L}$ is restricted 
+	to GR(1) LTL over ${\cal S} \cup {\cal AP}$, we can treat 
+	${\cal L}$ as $\phi_s$. 
+	Therefore, we have the overall specification 
+	\[(\bigwedge_i ({\cal S}^0_i \land {\lambda}_i))
+    \Rightarrow\ {\cal L}\] in GR(1) LTL.
+
+\end{itemize}
+
+\noindent
+The reduction to GR(1) LTL is illustrated through the following 
+example.
+
+\begin{example} \label{example6.2}
+{\em Consider the specification of the protocol given in 
+Example~\ref{example6.1}. The set of atomic propositions ${\cal AP}$ 
+and the input/output partitions have been mentioned already. 
+The auxiliary state machine $M1$ can be 
+characterized as a conjunction of the following components:
+\begin{itemize}
+\item $IDLE$: corresponding to the initial state, and 
+
+\item ${\cal T}_1 = \bigwedge_{i} G\ B_i$ where the $B_i$s 
+are defined as follows:
+
+\begin{itemize}
+\item $B_1 : IDLE \land \neg frame \Rightarrow X\ IDLE$ 
+\item $B_2 : IDLE \land frame \Rightarrow X\ BUSY$
+\item $B_3 : BUSY \land \neg ack \land frame \Rightarrow X\ BUSY$
+\item $B_4 : BUSY \land \neg frame \Rightarrow X\ IDLE$
+\item $B_5 : BUSY \land frame \land ack \Rightarrow X\ RDY$
+\item $B_6 : RDY \land \neg irdy \Rightarrow X\ RDY$
+\item $B_7 : RDY \land \neg trdy \land irdy \Rightarrow X\ WAIT$
+\item $B_8 : RDY \land trdy \land irdy \Rightarrow X\ TRANS$
+\item $B_9 : WAIT \land trdy \land irdy \Rightarrow X\ TRANS$
+\item $B_{10} : WAIT \land \neg irdy \Rightarrow X\ RDY$
+\item $B_{11} : WAIT \land \neg trdy \land irdy \Rightarrow X\ WAIT$
+\item $B_{12} : TRANS \land frame \Rightarrow X\ TRANS$
+\item $B_{13} : TRANS \land \neg frame \Rightarrow X\ IDLE$
+\end{itemize}
+\end{itemize}
+
+\noindent
+The auxiliary state machine $M2$ can be
+characterized as a conjunction of the following components:
+\begin{itemize}
+\item $INIT$: corresponding to the initial state, and
+\item ${\cal T}_2 = \bigwedge_{i} G\ B_i$ where the $B_i$s 
+are defined as follows:
+\begin{itemize} 
+\item $B_1 : INIT \land \neg frame \Rightarrow X\ DONE$ 
+\item $B_2 : INIT \land frame \land \neg stop \Rightarrow X\ INIT$
+\item $B_3 : INIT \land frame \land stop \Rightarrow X\ STOP$
+\item $B_4 : STOP \land frame \Rightarrow X\ STOP$
+\item $B_5 : STOP \land \neg frame \Rightarrow X\ DONE$
+\item $B_6 : DONE \Rightarrow X\ DONE$
+\end{itemize}
+\end{itemize}
+
+\noindent
+The auxiliary state machine definition can be described by the 
+formula $IDLE \land {\cal T}_1 \land INIT \land {\cal T}_2$, which 
+obeys the semantics of $\phi_e$ in GR(1) LTL.
+The set of assertion $P1 \ldots P4$ are all defined in context-sensitive 
+GR(1) LTL, and therefore, $\phi_s = P1 \land P2 \land P3 \land P4 \land P5$.
+Hence, the overall specification for our example master device 
+is of the form: 
+\[(IDLE \land {\cal T}_1 \land INIT \land {\cal T}_2) \Rightarrow 
+(P1 \land P2 \land P3 \land P4 \land P5)\]
+which is in GR(1) LTL.
+}$\Box$
+\end{example}
+
+\noindent
+For checking realizability of a context-sensitive specification 
+specified as a set of auxiliary state machines and context-sensitive 
+GR(1) LTL properties,  we can apply the realizability checking 
+procedure described in~\cite{nir} with ${\cal I} \cup {\cal S}$ as the set of 
+input variables and ${\cal O}$ as the set of output variables.
+This leads us to the following theorem. 
+
+\begin{theorem} \label{thrm6.5}
+The problem of realizability checking of a context-sensitive 
+property $\phi$ is reducible to the realizability problem of 
+GR(1) LTL. \\
+{\bf Proof}: {\em The proof follows from the discussion above.
+} $\Box$
+\end{theorem}
+
+
+\section{Implementation and Results} \label{sec6.4}
+{
+\begin{table}[!t]
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+Ckt  &{\#i/p}  &{\#o/p}&{\#Assert}& Time (s) \\ \hline \hline
+\multicolumn{5}{|c|}{AMBA AHB} \\ \hline \hline
+Master & 7 & 10 & 25 & 16.57 \\ \hline \hline
+Slave & 10 & 5 & 10 & 14.22 \\ \hline \hline
+Arbiter & 10 & 3 & 10 & 13.38  \\ \hline \hline
+\multicolumn{5}{|c|}{PCI} \\ \hline \hline
+Master & 10 & 8 & 18 & 12.2 \\ \hline \hline
+Slave & 8 & 6 & 12 & 5.2 \\ \hline \hline
+
+\end{tabular}
+\end{center}
+\caption{Results on ARM AMBA AHB and PCI} \label{tab6.1}
+\end{table}
+}
+
+We have implemented the methods outlined in this chapter in a tool that checks
+the realizability of assertion IPs designed in our proposed style. 
+Our method has been built on top of Anzu~\cite{jobst}, a tool with 
+realizability checking capabilities.
+As case studies, we considered two industry standard assertion suites 
+for the ARM AMBA
+AHB~\cite{ahb} protocol and the PCI~\cite{pci} protocol. The specification 
+document of the PCI protocol~\cite{pci} contains the auxiliary state machines 
+for the master and the slave devices. We refined these descriptions 
+with input conditions and factored them. For the AMBA AHB specification, 
+we constructed the auxiliary state machines ourselves for each of the master, 
+the slave and the arbiter devices. We translated 
+the property suites (originally in System
+Verilog Assertions) into LTL to enable our tool to work on it.
+
+\noindent
+Table~\ref{tab6.1} shows the run times of our tool for checking realizability 
+using Anzu as the underlying engine.
+The tool was run on a 2.4 Ghz Pentium-IV with 1 GB RAM. 
+On running our tool, we found that some properties turned out to be 
+unrealizable when interpreted over individual modules.
+The first column indicates the interface type (master / slave / arbiter), the
+second and third columns show the number of input and output signals in these
+interfaces respectively. The fourth column shows the number of assertions.
+The fifth column shows the time required for 
+realizability checking (in seconds).
+
+\section{Concluding Remarks} \label{sec6.5}
+In this chapter, we have analyzed the complexities of the satisfiability and 
+realizability problems for context-bounded properties. In addition, 
+we have analyzed the complexity of the realizability problem for 
+context-sensitive GR(1) LTL.
+With the increasing adoption of this mixed (context state machine
++ formal properties) architectural style for assertion IP development,
+we believe that the analysis presented in this chapter will be
+of significant value to the validation community. 

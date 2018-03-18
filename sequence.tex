@@ -1,0 +1,298 @@
+\subsection{The Overall Scheme} \label{sec5}
+\noindent
+In this section, we present a top-down view of our proposed strategies. 
+In the initial instant, the sensors send all the data predicates, whose derivatives are not 0, to the server.
+Next time onwards, the sensors send the data predicates to the server only if the server asked for the data predicates.
+When the server notifies the sensor for a particular data predicate, the sensor sends the predicate immediately and 
+next time it sends the predicate to the server only if there is a 
+change in the value of the predicate, i.e., in 
+asynchronous mode. 
+
+\noindent
+The context rule evaluation semantics at the server end is as follows: \\
+The server computes the predicates required to evaluate all 
+the context rules in the next instance based on the current snapshot and accordingly notifies it to the sensor. 
+As in the synchronous mode, the transmission follows the query-response model but unlike synchronous mode, instead of sending 
+all the predicates in each round, the sensors send the predicates only if they are notified to send. 
+Again, unlike asynchronous mode, the sensor does not send the predicates all the time, but only when the values of the 
+predicates change. Hence, the transmission mode basically falls between the synchronous and asynchronous transmission 
+mechanisms.
+The step by step transmission optimization mechanism for our strategy is shown in Figure~\ref{flow_chart}.
+We are given a set $\hat{{\cal{C}}}$ of context rules over a set of Boolean predicates ${\cal{P}}$. 
+The server performs the following pre-processing steps:
+
+\begin{figure}%[htb]
+\begin{center}
+\fbox{
+\includegraphics[height=5in,width=5in]{fig0.png}
+
+}
+\caption{Transmission Optimization Mechanism}
+\label{flow_chart}
+\end{center}
+%\label{fc}
+\end{figure}
+
+
+\vspace{2 mm}
+
+\noindent
+ {\bf{Step 1:}} Use Derivative analysis to compute the set 
+ ${\cal{P}}_1$, the set of predicates that is critical to the server, and 
+ ${\cal{P}}_2$, the set of predicates not required for any context rule by the server.
+ Based on the result, the server informs the sensors to stop monitoring the data variables 
+ corresponding to the data predicates belonging to ${\cal{P}}_2$ and also to transmit all 
+ changes of the data predicates belonging to ${\cal{P}}_1$. 
+ 
+ \noindent
+The formal procedure for derivative analysis is shown in Algorithm~\ref{algo1}.
+
+%====================================
+
+\begin{algorithm}[!htb]
+  \caption{DerivativeAnalysis}
+
+  \begin{algorithmic}[1]
+    %\Procedure{DerivativeAnalysis} {${\cal{P}}, {\cal{C}}$}\\
+\State { Input:  ${\cal{P}}=\{p_1,p_2,\ldots,p_m\}, {\cal{C}}=\{{\cal{C}}_1,{\cal{C}}_2,\ldots,{\cal{C}}_k\}$}
+\State { Output: ${\cal{P}}_1, {\cal{P}}_2, {\cal{P}}_3$}
+\For{$p \in {\cal{P}}$}
+  \For{$c \in {\cal{C}}$}
+    \State Calculate $\partial{c}/\partial{p}$
+    \If{$\partial{c}/\partial{p} = 1$} %for some $c \in {\cal{C}}$ and $u \in {\cal{V}}$}
+      \State ${\cal{P}}_1 = {\cal{P}}_1 \cup \{p\}$ 
+          
+    \EndIf
+  \EndFor
+  \If{$\partial{c}/\partial{p} = 0,\text{ } \forall c \in {\cal{C}}$}  
+      \Comment{\emph{Useless for all rules}}
+      \State ${\cal{P}}_2 = {\cal{P}}_2 \cup \{p\}$
+  \EndIf
+\EndFor
+\State ${\cal{P}}_3 = {\cal{P}} \setminus ({\cal{P}}_1 \cup {\cal{P}}_2)$      
+%\EndProcedure 
+  \end{algorithmic}
+  \label{algo1}
+\end{algorithm}
+
+
+%====================================
+
+
+\begin{comment}
+
+ \begin{boxedalgorithmic}%[1]    
+ \Procedure{DerivativeAnalysis} {${\cal{P}}, {\cal{C}}$}\\
+{ Input:  (${\cal{P}}=\{p_1,p_2,\ldots,p_m\}, {\cal{C}}=\{{\cal{C}}_1,{\cal{C}}_2,\ldots,{\cal{C}}_k\}$)}\\
+{ Output: (${\cal{P}}_1, {\cal{P}}_2, {\cal{P}}_3$)}
+\For{$p \in {\cal{P}}$}
+  \For{$c \in {\cal{C}}$}
+    \State Calculate $\partial{c}/\partial{p}$
+    \If{$\partial{c}/\partial{p} = 1$} %for some $c \in {\cal{C}}$ and $u \in {\cal{V}}$}
+      \State ${\cal{P}}_1 = {\cal{P}}_1 \cup \{p\}$ 
+          
+    \EndIf
+  \EndFor
+  \If{$\partial{c}/\partial{p} = 0,\text{ } \forall c \in {\cal{C}}$}  \\
+      \Comment{\emph{Useless for all rules}}
+      \State ${\cal{P}}_2 = {\cal{P}}_2 \cup \{p\}$
+  \EndIf
+\EndFor
+\State ${\cal{P}}_3 = {\cal{P}} \setminus ({\cal{P}}_1 \cup {\cal{P}}_2)$      
+\EndProcedure
+
+\end{boxedalgorithmic}
+
+\label{algo1}
+\end{comment}
+
+%\\
+\vspace{2 mm}
+\noindent
+ {\bf{Step 2:}} Evaluate the positive and negative co-factors of all 
+ 	 context rules with respect to 
+ 	 each predicate belonging to (${\cal{P}} \setminus {\cal{P}}_2$) in the cases where 
+ 	 $\partial{c}/\partial{p} \ne 1$.
+ 	 
+ \vspace{2 mm}
+ \noindent
+ {\bf{Step 3:}} Analyze the two variable co-factors for each context rule 
+ 	 ${{\cal{C}}}$ using the  
+     set of predicates such that ${\cal{C}}_p$ and ${\cal{C}}_{\bar{p}}$ 
+ 	 are not constant for all $p$ in that predicate set.
+  \noindent
+In Algorithm~\ref{algo2} we explain the formal procedure for co-factor analysis.
+ 
+ %++++++++++++++++++++++++++++++++++++++
+ 
+ 
+\begin{algorithm}[!htb]
+  \caption{Co-factorAnalysis}
+
+  \begin{algorithmic}[1]
+\State{ Input:  ${\cal{P}}_1, {\cal{P}}_3, {\cal{C}}=\{{\cal{C}}_1,{\cal{C}}_2,\ldots,{\cal{C}}_k\}$}\\
+\Comment{\emph{Single Variable Co-factor Analysis}}
+ \For {$c \in {\cal{C}}$}
+  \For {$p \in {\cal{P}}_1 \cup {\cal{P}}_3$ and $\partial{c}/\partial{p} \neq 1$}
+    \State calculate $c_p$ and $c_{\bar{p}}$
+    \State Find the set ${\cal{P}}_{c_{p}}$, ${\cal{P}}_{c_{\bar{p}}}$, the set of all variables 
+    required to evaluate $c_p$ and $c_{\bar{p}}$ 
+  \EndFor
+ \EndFor\\
+\Comment{\emph{Multiple Variable Co-factor Analysis}}
+  \For {$c \in {\cal{C}}$}
+   \For {$p, q \in ({\cal{P}}_1 \cup {\cal{P}}_3)$ and $p\neq q$ and $\partial{c}/\partial{p} \neq 1$ 
+   and $\partial{c}/\partial{q} \neq 1$}
+	\State calculate $c_{pq}$, $c_{\bar{p}q}$, $c_{p\bar{q}}$ and $c_{\bar{p}\bar{q}}$\\
+  \indent \Comment{\emph{If the co-factor of $c$ with respect to any of the literals in the
+   set $\{p,\bar{p},q,\bar{q}\}$ }} is ~\\
+   \indent~~~~~~~~~ {\emph{constant, we do not calculate the double variable co-factor involving that literal}}
+    %\indent \Comment{\emph{that literal}} 
+  %\indent \indent \Comment{\emph{   ~to any of the literals in the set}} \\
+  %\indent \indent \Comment{\emph{ $\{p,\bar{p},q,\bar{q}\}$}} is constant, then we\\
+  %\indent \indent \Comment{\emph{~ ~~~~do not calculate the double}}\\
+  %\indent \indent \Comment{\emph{variable co-factor involving that}}\\
+  %\indent \indent \Comment{\emph{ literal}}
+	\State Find the sets ${\cal{P}}_{c_{pq}}$, ${\cal{P}}_{c_{\bar{p}q}}$, ${\cal{P}}_{c_{p\bar{q}}}$  
+	and ${\cal{P}}_{c_{\bar{p}\bar{q}}}$, the set of predicates required to evaluate 
+       \indent~~ $c_{pq}$, $c_{\bar{p}q}$, $c_{p\bar{q}}$ and $c_{\bar{p}\bar{q}}$      
+      \EndFor  
+   \EndFor
+ %\EndProcedure
+%\label{algo2}
+  \end{algorithmic}
+  \label{algo2}
+\end{algorithm} 
+ %++++++++++++++++++++++++++++++++++++++
+
+ \begin{comment}
+\begin{boxedalgorithmic}[1] 
+\Procedure{Co-factorAnalysis}{${\cal{P}}_1, {\cal{P}}_3, {\cal{C}}$}\\
+{ Input:  (${\cal{P}}_1, {\cal{P}}_3, {\cal{C}}=\{{\cal{C}}_1,{\cal{C}}_2,\ldots,{\cal{C}}_k\}$)}\\
+%{ Output: ${\cal{V}}_o = \{{\cal{V}}_{c_1},{\cal{V}}_{c_2},\ldots,{\cal{V}}_{c_k}\}$}
+\Comment{\emph{Single Variable Co-factor Analysis}}
+ \For {$c \in {\cal{C}}$}
+  \For {$p \in {\cal{P}}_1 \cup {\cal{P}}_3$ and $\partial{c}/\partial{p} \neq 1$}
+ %so that the derivative analysis of $u$ with respect to $c$ is not 1 }
+    \State calculate $c_p$ and $c_{\bar{p}}$
+    \State Find the set ${\cal{P}}_{c_{p}}$, ${\cal{P}}_{c_{\bar{p}}}$, the set of all 
+    \indent \indent ~variables required to evaluate $c_p$ and $c_{\bar{p}}$ 
+  \EndFor
+ \EndFor\\
+\Comment{\emph{Multiple Variable Co-factor Analysis}}
+  \For {$c \in {\cal{C}}$}
+   \For {$p, q \in ({\cal{P}}_1 \cup {\cal{P}}_3)$ and $p\neq q$ and $\partial{c}/\partial{p} \neq 1$ 
+   \indent \indent ~~and $\partial{c}/\partial{q} \neq 1$}
+      %the derivative analysis of $u, v$ with respect to $c$ are not 1}
+	\State calculate $c_{pq}$, $c_{\bar{p}q}$, $c_{p\bar{q}}$ and $c_{\bar{p}\bar{q}}$\\
+  \indent \Comment{\emph{If the co-factor of $c$ with respect}} \\
+  \indent \indent \Comment{\emph{   ~to any of the literals in the set}} \\
+  \indent \indent \Comment{\emph{ $\{p,\bar{p},q,\bar{q}\}$}} is constant, then we\\
+  \indent \indent \Comment{\emph{~ ~~~~do not calculate the double}}\\
+  \indent \indent \Comment{\emph{variable co-factor involving that}}\\
+  \indent \indent \Comment{\emph{ literal}}
+	\State Find the set ${\cal{P}}_{c_{pq}}$, ${\cal{P}}_{c_{\bar{p}q}}$, ${\cal{P}}_{c_{p\bar{q}}}$ and 
+	${\cal{P}}_{c_{\bar{p}\bar{q}}}$,
+      \indent \indent~ the set of all variables required to evaluate 
+      \indent \indent~ $c_{pq}$, $c_{\bar{p}q}$, $c_{p\bar{q}}$ and $c_{\bar{p}\bar{q}}$  
+      \EndFor  
+   \EndFor
+ \EndProcedure
+\end{boxedalgorithmic}   
+\label{algo2}
+\end{comment}
+%\\
+%\\\\
+\vspace{2 mm}
+\noindent
+ {\bf{Step 4:}} Sensor Data Aggregation: Consider the set 
+ ${\cal{P}}_3 = ({\cal{P}} \setminus ({\cal{P}}_1 \cup {\cal{P}}_2))$. The server can 
+ instruct the sensor which predicates can be transmitted by ORing or ANDing. 
+ Let the new set be ${\cal{P}}_4$, where some predicates belonging to ${\cal{P}}_3$ are 
+ combined into one. Though they are different data parameters while observing, 
+ they are combined while transmitting.
+ 
+ \vspace{2 mm} 
+ \noindent
+ {\bf{Step 5:}} For each context rule ${{\cal{C}}}$, 
+ 		find two sets of predicates in which the context rule is positive 
+        and negative unate such that the derivative of the predicate that belongs to these two sets is not constant.
+        %such that $\forall v$ belong to that 
+        %sets $\partial{c}/\partial{v}$ is not equal to constant.
+ 
+%\\
+ %\\       %\end{itemize}
+ 
+ \noindent
+We describe the formal procedure for computing the positive and negative unate sets in Algorithm~\ref{algo3}.
+ %**********************************
+ 
+ 
+\begin{algorithm}[!htb]
+  \caption{UnateAnalysis}
+
+  \begin{algorithmic}[1]
+  \State { Input:  ${\cal{P}}_1, {\cal{P}}_3, {\cal{C}}=\{{\cal{C}}_1,{\cal{C}}_2,\ldots,{\cal{C}}_k\}$}
+%{ Output: $\cal{R}$}
+%\begin{enumerate}
+ \For{$c \in {\cal{C}}$}
+  \For{$p \in {\cal{P}}_1 \cup {\cal{P}}_3$ such that $\partial{c}/\partial{p} \neq 1$} 
+    \If{$c$ is positive unate in $p$}
+      \State put $p$ in $Pos_c$ \Comment{\emph{Set of positive unate}}
+    \ElsIf{$c$ is negative unate in $p$} 
+      \State put $p$ in $Neg_c$ \Comment{\emph{Set of negative unate}}
+    \EndIf
+  \EndFor
+ \EndFor
+  \end{algorithmic}
+  \label{algo3}
+\end{algorithm}
+
+
+ 
+ %**********************************
+
+ 
+ \begin{comment}
+ 
+\begin{boxedalgorithmic}[1] 
+\Procedure{UnateAnalysis}{${\cal{P}}_1, {\cal{P}}_3, {\cal{C}}$}\\
+{ Input:  (${\cal{P}}_1, {\cal{P}}_3, {\cal{C}}=\{{\cal{C}}_1,{\cal{C}}_2,\ldots,{\cal{C}}_k\}$)}
+%{ Output: $\cal{R}$}
+%\begin{enumerate}
+ \For{$c \in {\cal{C}}$}
+  \For{$p \in {\cal{P}}_1 \cup {\cal{P}}_3$ such that $\partial{c}/\partial{p} \neq 1$} 
+    \If{$c$ is positive unate in $p$}
+      \State put $p$ in $Pos_c$ 
+    \ElsIf{$c$ is negative unate in $p$} 
+      \State put $p$ in $Neg_c$
+    \EndIf
+  \EndFor
+ \EndFor
+ %\item At execution time $\forall{c} \in {\cal{C}}$, if $c=1$
+ %find the set ${\cal{V}}_c = {\cal{V}}_c \setminus \{u\}$, where $u=0$ and $u \in Pos_c$;
+ %if $c=0$
+ %find the set ${\cal{V}}_c = {\cal{V}}_c \setminus \{u\}$, where $u=1$ and $u \in Neg_c$.  
+ % $R = {\cal{V}}_3 \setminus ({\cup_{c \in {\cal{C}}}}{\cal{V}}_c)$, the set which is not currently required by the server.
+%\end{enumerate}
+\EndProcedure
+\end{boxedalgorithmic}   
+\label{algo4}
+\\
+\\\end{comment}
+\vspace{2 mm}
+\noindent
+The following is an execution time computation:
+
+\vspace{2 mm}
+%\begin{itemize}
+\noindent
+{\bf{Step 6:}} Find the set of predicates (${\cal{P}}_c$) to evaluate each context rule (${{\cal{C}}}$) 
+ 		depending on the current snapshot. Then the server
+	    informs the appropriate sensors to stop transmitting predicates 
+	    belonging to ${\cal{P}}_3 \setminus (\cup _{c \in {\cal{C}}}{{\cal{P}}_c})$.
+%\end{itemize}
+
+
+
+

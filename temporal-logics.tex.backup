@@ -1,0 +1,441 @@
+The use of temporal logics in verification was proposed by Pnueli in a seminal
+paper~\cite{pnueli:77}. Since then several different logics have been proposed
+for specifying temporal properties. 
+All these logics use the two basic temporal operators --
+{\em next} and {\em until}. Some of these logics also use additional 
+temporal operators that can be derived out of the basic two. The logics differ
+in terms of how we are allowed to mix these operators to express the desired
+formula.
+
+In this section we introduce the popular
+temporal operators and the logics that are built around them. In this part
+we also introduce some formalisms in an intuitive way that show us how
+these logics are interpreted over time.
+
+\subsubsection{The basic temporal operators} \label{sec2.1} 
+\index{temporal operators}
+
+The formal introduction to a language has two main parts, namely the 
+{\em syntax} and the {\em semantics}. The syntax defines the {\em grammar}
+of the language -- it tells us how we may construct properties using the
+basic set of signals and operators. The semantics define the {\em meaning}
+of the properties.
+
+The semantics of the traditional temporal logics were defined over {\em closed
+systems}, which are finite state machines without any inputs. This tradition
+has been followed in languages such as SVA and PSL as well -- there is no
+distinction between input and non-input variables in these languages. At this
+point we will present the semantics of these languages in the traditional form
+over a non-deterministic finite state machine. Open systems (modules having
+input bits) can be modeled by treating the input bits also as state bits. This
+will typically yield a non-deterministic state machine, since the choice of
+inputs in the next state lies with the environment, and is not a function of
+the present state.
+
+Suppose $J$ is a finite state machine having $k$ state bits. Each of the $2^k$
+valuations of these state bits represent a {\em state} of the machine.
+Let $S$ denote the set of these states. Let $R$ denote the {state transition
+relation} of $J$. $R$ consists of pairs of states, $(s_i, s_j)$, where it
+is possible to transit from state $s_i$ to state $s_j$. Finally, $J$ has a
+start state $s$. Formaly we say that $J$ is a tuple 
+$\langle S, s, R \rangle$.
+
+%\begin{figure}[htb]
+%\centering
+%\includegraphics[scale=0.6]{../temporal-logics/diag23.pstex}
+%\center
+%\caption{A sample finite state machine} \label{fig2.3}
+%\end{figure}
+
+\begin{example} \label{ex2.1}
+Fig~\ref{fig2.3} shows a 3-bit finite state machine. Let the state bits be
+$n_0, n_1, n_2$. The state bits are shown on the nodes. The start state is
+$s_0$. Fig~\ref{fig2.3} shows 5 states -- the remaining three states are
+not reachable from the start state and are not shown. The circuit has
+three outputs, which are functions of the state bits. These are:
+\begin{eqnarray*}
+p & = & n_0\ \lor\ n_1 \\
+q & = & n_2 \\
+r & = & \neg n_0\ \land\ \neg n_1\ \land\ \neg n_2
+\end{eqnarray*}
+The nodes of Fig~\ref{fig2.3} are labeled by the outputs that are true at
+that state. We shall use this toy example to demonstrate the meaning of 
+various temporal properties. $\Box$
+\end{example}
+
+\subsubsection{Intuitive explanation}
+
+To convey the semantics of the basic temporal operators, we will first
+introduce the notion of a {\em run} (alternatively, a {\em path} or a 
+{\em trace}). A run, $\pi$, of $J$ is a sequence of states,
+$\nu_0, \nu_1, \ldots$, where $s = \nu_0$ is the start of the run, and for
+each $i$, $\nu_i$ represents a state in $S$, and $R$ contains a transition 
+from the state represented by $\nu_i$ to the state represented by $\nu_{i+1}$.
+In other words, the run is a sequence of states repesenting a valid sequence
+of state transitions of $J$. For example the run,
+$\pi = s_0, s_1, s_3, s_1, s_4, \ldots$, is one run of the state machine shown
+in Fig~\ref{fig2.3}. States of the machine may be revisited in the run --
+for example we have $\nu_1 = \nu_3 = s_1$ in $\pi$. The run, 
+$\pi' = s_0, s_2, s_0, \ldots$, does not belong to this state machine, since
+it has no transition from $s_2$ to $s_0$.
+
+Let us now consider the two fundamental temporal operators, namely {\em next}
+and {\em until}, and a run $\pi = s_0, s_2, s_3, \ldots$.
+\begin{description}
+
+\item[Next operator: ] \index{temporal operators!next time} A property, 
+	{\em next $f$}, is true at a state
+	of a run iff the property $f$ is true at the next state on the run.
+	For example, {\em next $q$} is false at the state, $s_0$, of the run,
+	$\pi = s_0, s_2, s_3, \ldots$, since $q$ is false at the next state
+	$s_2$. The property {\em next next $q$} is true at $s_0$,
+	of $\pi$, because $q$ is true at $s_3$.
+
+\item[Until operator: ] \index{temporal operators!until}
+	A property, {\em $f$ until $g$}, is true at a
+	state of a run iff the property $g$ holds on some future state, $z$,
+	of the run, and the property $f$ holds on all states preceding $z$
+	on the run. For example, the property, {\em $p$ until $q$}, is true
+	at the start state of $\pi$, since $q$ is true at the state $s_3$
+	and $p$ is true at the states $s_0, s_2$ preceding $s_3$ in $\pi$.
+	The property, {\em $p$ until $r$}, is false on all paths of 
+	Fig~\ref{fig2.3}, because no $r$-labelled state can be reached along
+	a $p$-labelled path starting from $s_0$.
+
+\end{description}
+We will now define the two other operators shown in Chapter~\ref{intro}, 
+namely, {\em always} and {\em eventually}. To do this, we need the definitions
+of the propositions, {\em TRUE} and {\em FALSE}. We say that the proposition,
+{\em TRUE}, holds in all states, and the proposition, {\em FALSE}, is false
+in all states.
+\begin{description}
+
+\item[Eventually operator: ] \index{temporal operators!eventually}
+	A property, {\em eventually $f$}, is true at a state
+	of a run iff the property $f$ holds on some future
+	state in the run. Since the proposition, TRUE, holds on all states,
+	we can express the {\em eventually} operator using the {\em until}
+	operator as:
+	\[ \mbox{\em eventually } f\ =\ \mbox{\em TRUE until } f \]
+	The property, {\em eventually $q$}, holds on all runs starting from
+	$s_0$ in Fig~\ref{fig2.3}. The property, {\em eventually $r$}, does
+	not hold in the run which loops forever in the loop
+	$s_0, s_2, s_3, s_0$.
+
+\item[Always operator: ] \index{temporal operators!always}
+	A property, {\em always $f$}, is true on a run iff
+	the property $f$ holds on all states of the run. This is the same
+	as saying that $\neg f$ never holds on the run. In other words we
+	may write:
+	\begin{eqnarray*}
+	\mbox{\em always } f & = & \neg \mbox{\em eventually } \neg f \\
+	\mbox{\em eventually } f & = & \neg \mbox{\em always } \neg f
+	\end{eqnarray*}
+	The first equation allows us to express the {\em always} operator
+	using the {\em eventually} operator, and in turn, in terms of the
+	{\em until} operator. The second, says: {\em sometimes is not never}
+	-- there is a seminal paper with this title by Leslie 
+	Lamport~\cite{lamport:80}.
+
+	The property, {\em always $p$} is true in the run which loops forever
+	in the loop, $s_0, s_2, s_3, s_0$, in Fig~\ref{fig2.3}. The property
+	is false in all other runs of the same state machine.
+
+\end{description}
+The duality between the {\em always} and {\em eventually} operators is not
+surprising. \index{temporal operators!duality between} 
+In fact, it is a variant of DeMorgan's Laws when we interpret
+the properties over time. This is because:
+\begin{eqnarray*}
+\mbox{\em eventually } f & = & f\ \lor\ \mbox{\em next } f\ \lor\ 
+				\mbox{\em next next } f\ \lor\ 
+				\mbox{\em next next next } f\ \ldots\\
+& = & \neg \left( \neg f\ \land\ \mbox{\em next } \neg f\ \land\ 
+		\mbox{\em next next } \neg f\ \land\
+		\mbox{\em next next next } \neg f\ \ldots \right) \\
+& = & \neg \left( \mbox{\em always } \neg f \right)
+\end{eqnarray*}
+
+\subsubsection{Formal semantics} \index{temporal operators!semantics of}
+It is very important to know the formal semantics of a formal property
+specification language. If the semantics is specified ambiguously, there may
+be a gap between the property that the designer intends to express and the
+formal property tool's interpretation of the property that she writes.
+Bugs may hide in this gap thereby defeating the whole purpose of {\em formal}
+property verification. Language lawyer volunteers who make up the working
+groups of the language standards committees spend years debating
+over the exact formal semantics of the languages that they standardize.
+The goal of standardization is to ensure that languages with precise 
+definitions are made available to improve communcation within the
+industry.
+
+The problem with understanding formal semantics is that they are replete with
+terse notations. It is widely suspected that the intimidating nature of the
+notations used in existing literature on formal property verification is one
+of the main deterants to its wider adoption in practice.
+
+In reality, the formal semantics of the temporal operators do not convey 
+anything more than what we have discussed already. Nevertheless it is
+worthwhile to present the formal semantics, not only for the sake of
+completeness, but also to familiarize ourselves with the notations that 
+appear in almost all texts on formal property verification, including some 
+chapters of this book.
+
+To start with, we will use a set of short-forms. We will use $X$ to denote
+the {\em next} operator, $U$ to denote the {\em until} operator, $G$ to
+denote the {\em always} operator, and $F$ to denote the {\em eventually} 
+operator. $G$ means {\em globally with respect to time}, and $F$ means
+{\em in the future}.
+
+Let $\pi = \nu_0, \nu_1, \ldots$ denote a run, and 
+$\pi^k = \nu_k, \nu_{k+1}, \ldots$ denote the part of $\pi$ starting from
+$\nu_k$. We will use the notation $\pi \models f$ to denote that the property
+$f$ holds on the run $\pi$. Given a run $\pi$, we will also use the notation
+$\nu_k \models f$ to denote $\pi^k \models f$. In other words, a property is
+said to be true at an intermediate state of the run iff the fragment of the
+run starting from that state satisfies the property. The formal semantics of
+the basic temporal operators are as follows:
+\begin{itemize}
+
+\item $\pi$ $\models$ $Xf$ iff $\pi_1 \models f$
+\item $\pi$ $\models$ $f\ U\ g$ iff $\exists j$ such that 
+	$\pi_j\ \models\ g$ and $\forall i, 0 \leq i < j$ we have
+	$\pi_i\ \models\ f$.
+
+\end{itemize}
+$Fg$ is a short-form for TRUE $U\ g$, and $Gf$ is a short-form for
+$\neg F \neg f$.
+
+\section{Logics for temporal specification} \label{sec2.2}
+Temporal logics tell us how we can create complex temporal properties by
+putting together one or more temporal operators. There are broadly two
+classes of these logics, namely {\em linear time logics} and {\em branching
+time logics}. Linear time logics allow the specification of properties over
+linear traces or runs of a finite state machine -- intuitively, we say that
+the property holds on the machine if it holds on all runs of the machine.
+Branching time logics allow the specification of properties over the 
+computation tree created by a state traversal of the state machine.
+
+\subsubsection{Linear Temporal Logic} \label{sec2.2.1}
+\index{temporal logics!Linear Temporal Logic (LTL)}
+Designers and validation engineers typically express and interpret the
+RTL in terms of the simulation semantics of the HDL. They are accustomed to
+verifying the correctness of the RTL by checking certain behaviors over 
+simulation traces. Therefore it is not suprising that linear time logics
+have been the natural choice for design validation, and form the backbone
+of most existing property specification languages, including Forspec, PSL
+and SVA.
+
+{\em Linear Temporal Logic} (LTL) is the most popular among linear time
+logics. We can define the language recursively as follows:
+\begin{itemize}
+
+\item All Boolean formulas over the state variables are LTL properties.
+
+\item If $f$ and $g$ are LTL properties, then so are: $\neg f$, $Xf$, and
+	$f\ U\ g$.
+
+\end{itemize}
+We can also use the short-forms, $Fg$ for $true\ U\ g$, and $Gf$ for
+$\neg (true\ U\ \neg f)$.
+
+The semantics of LTL is as follows. We will say that the property $f$ holds
+on a state machine, $J$, iff $f$ holds on all paths of the state machine
+starting from its start state. The semantics of $f$ on a path is
+as defined in the last section.
+
+Let us see some sample LTL properties obtained by using one or more temporal
+operators. We refer to Fig~\ref{fig2.3}.
+\begin{itemize}
+
+\item The property $p\ U\ q$ is true in the state machine, since all paths
+	from $s_0$ satisfy this property.
+
+\item The property $Fq$ is true in the state machine, but the property
+	$GFq$ is not true. This is because we have the path, 
+	$\pi = s_0, s_1, s_4, \ldots$, which does not satisfy $Fq$ from
+	$s_4$ onwards.
+
+\item The property $p\ U\ (q\ U\ r)$ is not true in the state machine, 
+	because it may get trapped in the loop, $s_0, s_2, s_3, s_0$.
+
+\end{itemize}
+Fig~\ref{fig2.4} shows some sample LTL properties and some sample runs
+that satisfy these properties.
+
+%\begin{figure}[htb]
+%\centering
+%\includegraphics[scale=0.6]{../temporal-logics/diag24.pstex}
+%\center
+%\caption{Some sample LTL properties} \label{fig2.4}
+%\end{figure}
+
+\subsubsection{Computation Tree Logic} \label{sec2.2.2}
+\index{temporal logics!Computation Tree Logic (CTL)}
+{\em Computation Tree Logic} (CTL) is a branching time temporal logic.
+Properties described in this logic are interpreted over the {\em computation
+tree} obtained by unfolding the state machine as a tree. We will elaborate
+on this shortly, but let us first study the basic features of this logic.
+
+%\begin{figure}[htb]
+%\centering
+%\includegraphics[scale=0.6]{../temporal-logics/diag25.pstex}
+%\center
+%\caption{Some sample CTL properties} \label{fig2.5}
+%\end{figure}
+
+CTL has two {\em path quatifiers} in addition to the usual temporal operators.
+These are the {\em existential} path quantifier $E$, and the {\em universal}
+path quantifier $A$. 
+\begin{itemize}
+
+\item The property $A \varphi$ is true at a state, $\nu$, iff $\varphi$ is
+	true on {\em all} runs starting from $\nu$.
+
+\item The property $E \varphi$ is true at a state, $\nu$, iff $\varphi$ is
+	true on {\em some} run starting from $\nu$.
+
+\end{itemize}
+In CTL we have the restriction that every subformula of the form $Xf$, $Gf$,
+$Fg$, and $f\ U\ g$ must be prefixed by an $E$ or $A$. Therefore, we may
+define the language as:
+\begin{itemize}
+
+\item All Boolean formulas over the state variables are CTL properties.
+
+\item If $f$ and $g$ are CTL properties, then so are: $\neg f$, $AXf$, 
+	$EXf$, $A[f\ U\ g]$ and $E[f\ U\ g]$.
+
+\end{itemize}
+We also have the usual short-forms $Fg$ for $true\ U\ g$, and $Gf$ for
+$\neg (true\ U\ \neg f)$. Consequently, $EFg$, $AFg$, $EGf$, $AGf$ are CTL
+properties. Fig~\ref{fig2.5} shows some sample CTL properties and some sample
+computation trees that satisfy these properties.
+
+%\begin{figure}[htb]
+%\centering
+%\includegraphics[scale=0.6]{../temporal-logics/diag26.pstex}
+%\center
+%\caption{The notion of a Computation Tree} \label{fig2.6}
+%\end{figure}
+
+What is the significance of a {\em computation tree}? Let us consider the
+state machine of Fig~\ref{fig2.3}. We can unfold the state machine into 
+the infinite tree shown in Fig~\ref{fig2.6}. Each path of this tree is a
+run or a {\em computation} of the state machine. CTL allows us to define
+properties over the nodes of this computation tree.
+
+For example, consider the property:
+\[ A[p\ U\ E[q\ U\ r]] \]
+This property is true at the start state $s_0$ of our state machine. This
+follows from the fact that $E[q\ U\ r]$ is true at $s_1$ and $s_3$ (since
+there is a $q$-labeled sequence of states to the $r$-labelled state $s_4$),
+and every path from $s_0$ reaches one of these states through $p$-labelled
+states. It is not possible to express this property in LTL.
+
+\subsubsection{LTL versus CTL} \label{sec2.2.3}
+\index{temporal logics!LTL versus CTL}
+{\em Can all LTL properties be expressed in CTL using the universal path
+quantifier, $A$?}
+The answer is, no. For example, the LTL property, $FGp$, is not 
+equivalent to the CTL property, $AFAGp$. Fig~\ref{fig2.7} shows an example
+which satisfies $FGp$ but does not satisfy $AFAGp$.
+
+%\begin{figure}[htb]
+%\centering
+%\includegraphics[scale=0.6]{../temporal-logics/diag27.pstex}
+%\center
+%\caption{Module M satisfies FGp, but not AFAGp} \label{fig2.7}
+%\end{figure}
+
+{\em When do we use a linear time logic, and when do we use a branching time
+logic?} This is a matter of considerable debate, and is hardly agreed upon.
+However, experience shows that linear time logics are the natural choice
+for black-box testing. For example, while specifying the behavior of a
+module, we can write linear time properties over its interface signals 
+without knowing the internal state machine of the module. 
+
+On the other hand, branching time logics are useful for verifying properties
+over a given state machine. For example, when we develop an automotive control
+system we may typically model the control system as an abstract state machine,
+verify whether this control system satisfies certain safety properties and
+then expand the abstract state machine into the actual control system.
+When a branching time property fails, we must interpret the failure in terms
+of the actual states of the system, which is not possible in black-box
+testing.
+
+The temporal logic CTL$^*$ combines the expressive power of linear and
+branching time temporal logics. CTL and LTL are fragments of CTL$^*$. There
+has been several interesting extensions of these languages that demonstrate the
+tradeoff between the expressive power of the language and the complexity of
+model checking (that is, formally verifying) properties specified in these
+languages.
+
+\subsubsection{Real time temporal logics} \label{sec2.2.4}
+\index{temporal logics!real time}
+The temporal operators discussed so far, namely {\em next} (X), {\em until}
+(U), {\em always} (G), and {\em eventually} (F), are {\em temporal} because
+they can define sequences of events over time. Significantly, none of these 
+operators with the exception of the {\em next} operator, attempt to 
+{\em quantify} time. For example the property, {\em eventually $f$}, requires
+$f$ to be true in future, but does not specify any time bound by which $f$
+needs to be true.
+
+Real time temporal operators \index{temporal operators!real time}
+are intuitively simple extensions of the basic
+{\em untimed} temporal operators where we annotate the operator with a time
+bound. The real time extensions of CTL and LTL simply use these bounded 
+operators (as well as the unbounded ones). 
+\begin{description}
+
+\item[The bounded Until operator: ] \index{temporal operators!bounded until}
+	The property $f U_{[a,b]} g$ is true on
+	a run, $\pi = s_0, s_1, \ldots$, iff there exists a $k$, 
+	$a \leq k \leq b$ such that $g$ is true at $s_k$ on $\pi$, and $f$
+	is true on all preceding states, $s_0, \ldots, s_{k-1}$. Formally,
+	\[ \pi\ \models\ f\ U_{[a,b]}\ g \mbox{ iff } \exists k,
+	a \leq k \leq b, \nu_k\ \models\ g \mbox{ and } 
+	\forall i, 0 \leq i < k \mbox{ we have } \nu_i\ \models\ f \]
+	The bounded LTL property $p\ U_{[1,3]}\ q$ is true at the state
+	$s_0$ of Fig~\ref{fig2.3}. The bounded CTL property:
+	\[ A[ p\ U_{[1,3]}\ E[ q\ U_{[1,2]}\ r]] \]
+	is also true at $s_0$. This is because $s_3$ and $s_1$ satisfy
+	$E[ q\ U_{[1,2]}\ r]$ (since they can reach $s_4$ within the time
+	bound $[1,2]$), and we will reach $s_1$ or $s_3$ along all paths from
+	$s_0$ within the time bound $[1,3]$.
+
+\item[The bounded Eventually operator: ] The property $F_{[a,b]} g$ is true
+	on a run, $\pi = s_0, s_1, \ldots$, iff there exists a $k$,
+	$a \leq k \leq b$ such that $g$ is true at $s_k$ on $\pi$.
+	For example, the bounded LTL property $F_{[1,3]} q$ is true at the
+	state $s_0$ of Fig~\ref{fig2.3}. The bounded CTL property 
+	$EF_{[2,4]} r$ is true at $s_0$. The property $F_{[a,b]} g$ is
+	equivalent to the bounded-until property, $true\ U_{[a,b]}\ g$. 
+
+\item[The bounded Always operator: ] The property $G_{[a,b]} f$ is true
+	on a run, $\pi = s_0, s_1, \ldots$, iff $f$ is true in every
+	state in the sequence, $s_a, \ldots, s_b$. The bounded CTL property
+	$EG_{[3,9]} q$ is true in the state $s_0$ of Fig~\ref{fig2.3} --
+	consider the run from $s_0$ through $s_2$ which alternates between
+	$s_3$ and $s_1$ at least 8 times. The bounded LTL property
+	$G_{[0,1]} \neg r$ is true at $s_0$ since no run can reach $s_4$
+	is less than 2 cycles.
+
+\end{description}
+Real time operators are extremely useful in practice. Most design properties
+have a well defined time bound, and must be satisfied within that time.
+
+Since the real time operators deal with finite bounds, $a$ and $b$, they
+can be expressed in terms of the $X$ operator. For example, the property
+$F_{[2,4]} q$ can be rewritten as:
+\[ F_{[2,4]}\ q\ =\ XX(q\ \lor\ Xq\ \lor\ XXq) \]
+and $p\ U_{[3,4]}\ q$ can be rewritten as:
+\[ p\ U_{[3,4]}\ q\ =\ (p\ \land\ Xp\ \land\  XXp)\ \land\ 
+	XXX(q\ \lor\ (p\ \land\ Xq)) \]
+The first part of the property specifies that $p$ be must be true in the
+present cycle and the next two cycles. The second part of the property
+specifies that $q$ must be true in the third cycle, failing which, $p$
+must be true in the third cycle and $q$ must be true in the fourth cycle.
+
+Therefore, real time operators actually help us to succinctly express
+properties that would require too many $X$ operators otherwise.

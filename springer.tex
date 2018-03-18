@@ -1,0 +1,70 @@
+\documentclass[envcountsame,envcountchap]{svmono}
+
+% choose options for [] as required from the list
+% in the Reference Guide, Sect. 2.2
+
+\usepackage{makeidx}         % allows index generation
+\usepackage{graphicx}        % standard LaTeX graphics tool
+                             % when including figure files
+\usepackage{multicol}        % used for the two-column index
+\usepackage[bottom]{footmisc}% places footnotes at page bottom
+\usepackage{amsfonts}
+\usepackage{psfrag}
+
+\newtheorem{function}{Function}
+\newtheorem{algorithm}{Algorithm}[chapter]
+\newtheorem{assumption}{Assumption}
+% etc.
+% see the list of further useful packages
+% in the Reference Guide, Sects. 2.3, 3.1-3.3
+
+\makeindex             % used for the subject index
+                       % please use the style svind.ist with
+                       % your makeindex program
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+%\author{Ansuman Banerjee}
+\title{Formal Methods for Accelerating Formal, Semi-formal
+    and Dynamic Property Verification through Novel Specification Styles}
+% Insert your Booktitle, Subtitle, Edition\\
+%{\small SPIN Springer's internal project number, if known}}
+% \subtitle{}
+\date{}
+\maketitle
+
+\frontmatter%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\include{dedic}
+%\include{pref}
+
+\tableofcontents
+
+\parskip=.1in
+\mainmatter
+\input {certi}
+\input {abstract}
+
+%\input{chap1}
+\input{chap2}
+%\input{chap3}
+%\input{chap4}
+%\input{chap5}
+%\input{chap6}
+%\input{chap7}
+%\input{chap8}
+%\input{concl}
+%\input{chap7}
+
+%\appendix
+%\input {./appendixA/appendixA}
+%\input {./appendixB/appendixB}
+%\input {biblio}
+
+%\bibliographystyle{999}
+%\addcontentsline{toc}{chapter}{\numberline{}\bibname}
+%\bibliography{reference}
+\mbox{}
+\end {document}
